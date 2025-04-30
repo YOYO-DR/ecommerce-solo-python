@@ -31,11 +31,13 @@ services:
 
   celeryworker:
     <<: *django
+    ports: []
     image: backend_production_celeryworker
     command: /start-celeryworker
 
   celerybeat:
     <<: *django
+    ports: []
     image: backend_production_celerybeat
     command: /start-celerybeat
 
