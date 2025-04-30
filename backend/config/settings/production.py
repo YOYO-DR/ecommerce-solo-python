@@ -208,7 +208,7 @@ sentry_sdk.init(
 # -------------------------------------------------------------------------------
 # Tools that generate code samples can use SERVERS to point to the correct domain
 SPECTACULAR_SETTINGS["SERVERS"] = [
-    {"url": "https://ecommerce_sp.yoyodr.dev", "description": "Production server"},
+    {"url": "https://ecommerce-sp-api.yoyodr.dev", "description": "Production server"},
 ]
 # Your stuff...
 # ------------------------------------------------------------------------------
