@@ -22,7 +22,7 @@ services:
       - ./.env
     command: /start
     ports:
-      - '5000:5000'
+      - '5050:5050'
 
   redis:
     image: docker.io/redis:6
