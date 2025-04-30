@@ -1,0 +1,58 @@
+volumes:
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
+  production_traefik: {}
+  
+  production_redis_data: {}
+  
+
+
+services:
+  django: &django
+    build:
+      context: ./backend
+      dockerfile: ./compose/production/django/Dockerfile
+
+    image: backend_production_django
+    volumes:
+      - ./logs:/app/logs:z
+    depends_on:
+      - redis
+    env_file:
+      - ./.env
+    command: /start
+    ports:
+      - '5000:5000'
+
+  redis:
+    image: docker.io/redis:6
+    volumes:
+      - production_redis_data:/data
+
+  celeryworker:
+    <<: *django
+    image: backend_production_celeryworker
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: backend_production_celerybeat
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: backend_production_flower
+    command: /start-flower
+    ports:
+      - '5555:5555'
+
+  frontend:
+    build:
+      context: ./frontend
+    env_file:
+      - ./.env
+    ports:
+      - '83:83'
+    depends_on:
+      - django
+
