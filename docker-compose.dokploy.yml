@@ -46,7 +46,7 @@ services:
   #   image: backend_production_flower
   #   command: /start-flower
   #   ports:
-  #     - '5555:5555'
+  #     - '5555:5555' 
 
   frontend:
     build:
