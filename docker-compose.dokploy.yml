@@ -29,17 +29,17 @@ services:
     volumes:
       - production_redis_data:/data
 
-  celeryworker:
-    <<: *django
-    ports: []
-    image: backend_production_celeryworker
-    command: /start-celeryworker
-
-  celerybeat:
-    <<: *django
-    ports: []
-    image: backend_production_celerybeat
-    command: /start-celerybeat
+  # celeryworker:
+  #   <<: *django
+  #   ports: []
+  #   image: backend_production_celeryworker
+  #   command: /start-celeryworker
+# 
+  # celerybeat:
+  #   <<: *django
+  #   ports: []
+  #   image: backend_production_celerybeat
+  #   command: /start-celerybeat
 
   flower:
     <<: *django
