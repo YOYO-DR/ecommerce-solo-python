@@ -4,7 +4,18 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [error, setError] = useState(null)
+
+  const handleHttpRequest = async () => { 
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}`)
+      console.log(response)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      alert('Failed to fetch data from the server.')
+      setError('Failed to fetch data from the server.')
+    }
+  }
 
   return (
     <>
@@ -18,7 +29,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={handleHttpRequest}>
           count is {count}
         </button>
         <p>
