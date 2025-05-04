@@ -55,4 +55,6 @@ services:
       - '83:83'
     depends_on:
       - django
+    env_file:
+      - ./.env
 
