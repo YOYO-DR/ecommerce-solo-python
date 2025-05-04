@@ -51,8 +51,6 @@ services:
     build:
       context: ./frontend
     container_name: frontend_production
-    env_file:
-      - ./.env
     ports:
       - '83:83'
     depends_on:
