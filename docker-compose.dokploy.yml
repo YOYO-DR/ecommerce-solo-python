@@ -4,7 +4,8 @@ volumes:
   production_traefik: {}
   
   production_redis_data: {}
-  
+
+  production_django_logs: {}
 
 
 services:
@@ -15,7 +16,7 @@ services:
 
     image: backend_production_django
     volumes:
-      - ./logs:/app/logs:z
+      - production_django_logs:/app/logs
     depends_on:
       - redis
     env_file:
