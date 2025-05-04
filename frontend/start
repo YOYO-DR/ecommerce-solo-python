@@ -8,4 +8,8 @@ wait-for-it "http://django:446" -t 30
 
 >&2 echo 'Django is available'
 
+echo $VITE_API_URL
+
+ls -ltr
+
 exec nginx -g daemon off;

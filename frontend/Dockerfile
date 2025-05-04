@@ -1,5 +1,5 @@
 # Etapa 1: Construir la aplicación
-FROM node:alpine AS builder
+FROM node:alpine
 WORKDIR /app
 COPY package*.json ./
 
@@ -7,9 +7,6 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-
-# Etapa 2: Servir los archivos estáticos con Nginx
-FROM nginx:alpine
 
 # === INICIO: Añadir wait-for-it ===
 # Instalar dependencias (bash es recomendable para wait-for-it, curl para descargarlo)
@@ -20,7 +17,7 @@ RUN curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnub
     && chmod +x /usr/local/bin/wait-for-it
 # === FIN: Añadir wait-for-it ===
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY /app/dist /usr/share/nginx/html
 # Configuración para manejar rutas de React Router
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY start /start
