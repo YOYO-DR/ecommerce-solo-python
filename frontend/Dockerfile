@@ -1,5 +1,7 @@
 # Etapa 1: Construir la aplicación
 FROM node:alpine AS builder
+
+ARG VITE_API_URL_ARG
 WORKDIR /app
 COPY package*.json ./
 
@@ -7,7 +9,7 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 # Crear archivo .env en la raíz del proyecto
-RUN echo "VITE_API_URL=${VITE_API_URL}" > .env
+RUN echo "VITE_API_URL=${VITE_API_URL_ARG}" > .env
 RUN echo "Contenido del .env generado:" && cat .env
 RUN npm run build
 

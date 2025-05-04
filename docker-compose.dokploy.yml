@@ -50,6 +50,8 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        - VITE_API_URL_ARG=${VITE_API_URL}
     # container_name: frontend_production
     ports:
       - '83:83'
