@@ -8,4 +8,4 @@ wait-for-it "django:446" -t 30
 
 >&2 echo 'Django is available'
 
-nginx -g daemon off;
+exec nginx -g daemon off;
