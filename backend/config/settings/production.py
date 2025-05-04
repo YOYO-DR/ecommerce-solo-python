@@ -135,10 +135,8 @@ SPECTACULAR_SETTINGS["SERVERS"] = [
 # AZURE_STORAGE_BLOB=container_name = nombreContainer  account_name = nombreCuenta  account_key = pass
 azure_storage_blob = env('AZURE_STORAGE_BLOB')
 azure_storage_blob_parametros = {parte.split(' = ')[0]:parte.split(' = ')[1] for parte in azure_storage_blob.split('  ')}
-try:
-  AZURE_CONTAINER = azure_storage_blob_parametros['container_name']
-except KeyError:
-  raise KeyError("No se ha encontrado el nombre del contenedor en la variable de entorno AZURE_STORAGE_BLOB %s",azure_storage_blob)
+
+AZURE_CONTAINER = azure_storage_blob_parametros['container_name']
 AZURE_ACCOUNT_NAME = azure_storage_blob_parametros['account_name']
 AZURE_ACCOUNT_KEY = azure_storage_blob_parametros['account_key']
 STORAGES = {
