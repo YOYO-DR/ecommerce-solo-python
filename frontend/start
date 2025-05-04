@@ -4,7 +4,7 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-wait-for-it "django:446" -t 30
+wait-for-it "http://django:446" -t 30
 
 >&2 echo 'Django is available'
 
