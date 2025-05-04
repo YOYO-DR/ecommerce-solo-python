@@ -6,6 +6,7 @@ COPY package*.json ./
 # Considera usar 'npm ci' para instalaciones más rápidas y deterministas si tienes package-lock.json
 RUN npm install
 COPY . .
+RUN echo $VITE_API_URL
 RUN npm run build
 
 # Etapa 2: Servir los archivos estáticos con Nginx
