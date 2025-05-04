@@ -4,9 +4,9 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-wait-for-it $VITE_API_URL -t 30
+wait-for-it "$API_URL:$API_PORT" -t 60
 
->&2 echo 'Django is available'
+>&2 echo 'API is available'
 
 echo $VITE_API_URL
 
