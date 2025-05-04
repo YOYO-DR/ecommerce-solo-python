@@ -17,6 +17,9 @@ if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(BASE_DIR / ".env"))
 
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOGS_DIR, exist_ok=True) # Crea el directorio 'logs' si no existe
+
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
@@ -268,7 +271,7 @@ LOGGING = {
             "level": "DEBUG",
             # Cambiado a TimedRotatingFileHandler
             "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": os.path.join(BASE_DIR,'logs', 'server.log'), # Nombre base del archivo
+            "filename": os.path.join(LOGS_DIR, 'server.log'), # Nombre base del archivo
             # --- Parámetros de Rotación ---
             "when": "midnight",  # Rotar cada día a medianoche
             "interval": 1,       # Intervalo de 1 día

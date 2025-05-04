@@ -15,7 +15,7 @@ services:
 
     image: backend_production_django
     volumes:
-      - ./logs:/app/logs:z
+      - ./backend/logs:/app/logs:z
     depends_on:
       - redis
     env_file:
