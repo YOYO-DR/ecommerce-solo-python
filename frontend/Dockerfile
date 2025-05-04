@@ -6,12 +6,13 @@ COPY package*.json ./
 # Considera usar 'npm ci' para instalaciones más rápidas y deterministas si tienes package-lock.json
 RUN npm install
 COPY . .
+# Crear archivo .env en la raíz del proyecto
+RUN echo "VITE_API_URL=${VITE_API_URL}" > .env
+RUN echo "Contenido del .env generado:" && cat .env
 RUN npm run build
 
 # Etapa 2: Servir los archivos estáticos con Nginx
 FROM nginx:alpine
-WORKDIR /app
-COPY . .
 # === INICIO: Añadir wait-for-it ===
 # Instalar dependencias (bash es recomendable para wait-for-it, curl para descargarlo)
 RUN apk add --no-cache bash curl
