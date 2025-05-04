@@ -70,18 +70,19 @@ services:
   #   ports: []
   #   command: /start-celerybeat
 
-  flower:
-    <<: *django
-    image: backend_local_flower
-    container_name: backend_local_flower
-    ports:
-      - '5555:5555'
-    command: /start-flower
+  # flower:
+  #   <<: *django
+  #   image: backend_local_flower
+  #   container_name: backend_local_flower
+  #   ports:
+  #     - '5555:5555'
+  #   command: /start-flower
   
   frontend:
     build:
       context: ./frontend
+    container_name: frontend_local
+    volumes:
+      - ./frontend:/app:z
     ports:
-      - '5173:5173'
-    depends_on:
-      - django
+      - '83:83'

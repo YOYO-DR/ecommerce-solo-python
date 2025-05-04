@@ -50,6 +50,7 @@ services:
   frontend:
     build:
       context: ./frontend
+    container_name: frontend_production
     env_file:
       - ./.env
     ports:
