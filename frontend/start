@@ -8,6 +8,4 @@ wait-for-it "$API_URL:$API_PORT" -t 60
 
 >&2 echo 'API is available'
 
-echo $VITE_API_URL
-
-exec nginx -g daemon off;
+exec nginx -g 'daemon off;'
