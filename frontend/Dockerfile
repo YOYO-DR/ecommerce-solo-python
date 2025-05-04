@@ -10,7 +10,8 @@ RUN npm run build
 
 # Etapa 2: Servir los archivos estáticos con Nginx
 FROM nginx:alpine
-
+WORKDIR /app
+COPY . .
 # === INICIO: Añadir wait-for-it ===
 # Instalar dependencias (bash es recomendable para wait-for-it, curl para descargarlo)
 RUN apk add --no-cache bash curl
