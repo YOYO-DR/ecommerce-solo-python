@@ -19,7 +19,7 @@ if [ -z "${REDIS_URL}" ]; then
   exit 1
 fi
 
-redis_host_port=$(echo "${REDIS_URL}" | sed -E 's/redis:\/\/([^:]+):([0-9]+)/\1:\2/')
+redis_host_port="${REDIS_HOST}:${REDIS_PORT}"
 wait-for-it "${redis_host_port}" -t 30
 
 >&2 echo 'Redis is available'

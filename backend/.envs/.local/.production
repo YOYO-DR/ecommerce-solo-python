@@ -65,3 +65,5 @@ SENTRY_DSN=
 DJANGO_SECRET_KEY=
 DJANGO_ADMIN_URL=
 DJANGO_ALLOWED_HOSTS=.dominio.com
+
+REDIS_URL=redis://default:default@redis:6379/0
