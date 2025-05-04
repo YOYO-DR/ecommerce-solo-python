@@ -2,9 +2,9 @@
 FROM node:alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-# Usa --no-optional para potencialmente reducir tamaño/vulnerabilidades si no necesitas dependencias opcionales
+
 # Considera usar 'npm ci' para instalaciones más rápidas y deterministas si tienes package-lock.json
-RUN npm install --no-optional
+RUN npm install
 COPY . .
 RUN npm run build
 
