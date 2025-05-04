@@ -1,6 +1,7 @@
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 
+import os
 import ssl
 from pathlib import Path
 
@@ -252,6 +253,9 @@ LOGGING = {
         "verbose": {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
+        "simple": {
+             "format": "%(levelname)s %(message)s",
+        },
     },
     "handlers": {
         "console": {
@@ -259,8 +263,42 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
+        # --- Handler de archivo con rotación diaria ---
+        "file": {
+            "level": "DEBUG",
+            # Cambiado a TimedRotatingFileHandler
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(BASE_DIR,'logs', 'server.log'), # Nombre base del archivo
+            # --- Parámetros de Rotación ---
+            "when": "midnight",  # Rotar cada día a medianoche
+            "interval": 1,       # Intervalo de 1 día
+            "encoding": "utf-8", # Especificar codificación (recomendado)
+            # --- Fin Parámetros de Rotación ---
+            "formatter": "verbose",
+        },
+        # ------------------------------------------
     },
-    "root": {"level": "INFO", "handlers": ["console"]},
+    "root": {
+        "level": "DEBUG",
+        "handlers": ["console", "file"],
+    },
+    "loggers": {
+        "django.db.backends": {
+            "level": "ERROR",
+            "handlers": [],
+            "propagate": True,
+        },
+        "sentry_sdk": {
+            "level": "ERROR",
+             "handlers": [],
+            "propagate": True,
+        },
+        "django.security.DisallowedHost": {
+             "level": "ERROR",
+             "handlers": [],
+            "propagate": True,
+        },
+    },
 }
 
 REDIS_URL = env("REDIS_URL", default="redis://redis:6379/0")
