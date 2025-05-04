@@ -14,3 +14,5 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY start /start
 RUN chmod +x /start
 EXPOSE 83
+
+ENTRYPOINT ["/start"]

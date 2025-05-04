@@ -55,5 +55,4 @@ services:
       - '83:83'
     depends_on:
       - django
-    command: /start
 
