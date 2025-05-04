@@ -11,4 +11,6 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 # Configuración para manejar rutas de React Router
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY start /start
+RUN chmod +x /start
 EXPOSE 83
