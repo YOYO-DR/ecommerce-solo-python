@@ -14,6 +14,8 @@ from .base import REDIS_URL
 from .base import SPECTACULAR_SETTINGS
 from .base import env
 
+logger = logging.getLogger(__name__)
+
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
@@ -133,8 +135,11 @@ SPECTACULAR_SETTINGS["SERVERS"] = [
 ]
 # Azure Storage
 # AZURE_STORAGE_BLOB=container_name = nombreContainer  account_name = nombreCuenta  account_key = pass
-azure_storage_blob = os.environ['AZURE_STORAGE_BLOB']
+azure_storage_blob = env('AZURE_STORAGE_BLOB')
 azure_storage_blob_parametros = {parte.split(' = ')[0]:parte.split(' = ')[1] for parte in azure_storage_blob.split('  ')}
+
+logger.info(f"azure_storage_blob: {azure_storage_blob}")
+logger.info(f"azure_storage_blob_parametros: {azure_storage_blob_parametros}")
 
 AZURE_CONTAINER = azure_storage_blob_parametros['container_name']
 AZURE_ACCOUNT_NAME = azure_storage_blob_parametros['account_name']
