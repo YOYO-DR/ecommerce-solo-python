@@ -1,9 +1,9 @@
 volumes:
-  production_postgres_data: {}
-  production_postgres_data_backups: {}
-  production_traefik: {}
+  # production_postgres_data: {}
+  # production_postgres_data_backups: {}
+  # production_traefik: {}
   
-  production_redis_data: {}
+  # production_redis_data: {}
 
   production_django_logs: {}
 
@@ -25,17 +25,17 @@ services:
     ports:
       - '446:446'
 
-  redis:
-    image: docker.io/redis:6
-    volumes:
-      - production_redis_data:/data
+  # redis:
+  #   image: docker.io/redis:6
+  #   volumes:
+  #     - production_redis_data:/data
 
   # celeryworker:
   #   <<: *django
   #   ports: []
   #   image: backend_production_celeryworker
   #   command: /start-celeryworker
-# 
+
   # celerybeat:
   #   <<: *django
   #   ports: []

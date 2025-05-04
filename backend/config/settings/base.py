@@ -389,5 +389,7 @@ SPECTACULAR_SETTINGS = {
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "SCHEMA_PATH_PREFIX": "/api/",
 }
-# Your stuff...
-# ------------------------------------------------------------------------------
+
+# Corsheaders
+CORS_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS = [url for url in os.environ['WEBSITE_FRONTEND_URL'].split(
+    ",")] if 'WEBSITE_FRONTEND_URL' in os.environ else []
