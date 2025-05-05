@@ -3,9 +3,9 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-
-wait-for-it "django:446" -t 60
-
->&2 echo 'API is available'
+# Espera 5 minutos al backend antes de iniciar el frontend
+>&2 echo 'Esperando que el backend esté disponible...'
+wait-for-it "django:446" -t 300
+>&2 echo 'Backend disponible, iniciando el frontend...'
 
 exec nginx -g 'daemon off;'
