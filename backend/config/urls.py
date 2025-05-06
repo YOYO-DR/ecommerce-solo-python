@@ -27,14 +27,13 @@ urlpatterns = [
     # User management
     path("users/", include("backend.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
-    # Your stuff: custom urls includes go here
-    # ...
-    # Media files
-    *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development
     urlpatterns += staticfiles_urlpatterns()
+    # Media files (En producción, se sirve desde azure storage)
+    *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
+
 
 # API URLS
 urlpatterns += [

@@ -14,11 +14,11 @@ env = environ.Env()
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
 if READ_DOT_ENV_FILE:
-    # OS environment variables take precedence over variables from .env
-    env.read_env(str(BASE_DIR / ".env"))
+  # OS environment variables take precedence over variables from .env
+  env.read_env(str(BASE_DIR / ".env"))
 
 LOGS_DIR = os.path.join(BASE_DIR, 'logs')
-os.makedirs(LOGS_DIR, exist_ok=True) # Crea el directorio 'logs' si no existe
+os.makedirs(LOGS_DIR, exist_ok=True)  # Crea el directorio 'logs' si no existe
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -87,6 +87,10 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "drf_spectacular",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
+    "django_prose_editor",
+    "djoser"
 ]
 
 LOCAL_APPS = [
@@ -168,10 +172,11 @@ STATICFILES_FINDERS = [
 
 # MEDIA
 # ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-MEDIA_ROOT = str(APPS_DIR / "media")
-# https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = "/media/"
+if DEBUG:
+  # https://docs.djangoproject.com/en/dev/ref/settings/#media-root
+  MEDIA_ROOT = str(APPS_DIR / "media")
+  # https://docs.djangoproject.com/en/dev/ref/settings/#media-url
+  MEDIA_URL = "/media/"
 
 # TEMPLATES
 # ------------------------------------------------------------------------------
@@ -242,7 +247,8 @@ ADMINS = [("""Yoiner Duran Rios""", "yoiner3216898182@gmail.com")]
 MANAGERS = ADMINS
 # https://cookiecutter-django.readthedocs.io/en/latest/settings.html#other-environment-settings
 # Force the `admin` sign in process to go through the `django-allauth` workflow
-DJANGO_ADMIN_FORCE_ALLAUTH = env.bool("DJANGO_ADMIN_FORCE_ALLAUTH", default=False)
+DJANGO_ADMIN_FORCE_ALLAUTH = env.bool(
+  "DJANGO_ADMIN_FORCE_ALLAUTH", default=False)
 
 # LOGGING
 # ------------------------------------------------------------------------------
@@ -257,7 +263,7 @@ LOGGING = {
             "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
         },
         "simple": {
-             "format": "%(levelname)s %(message)s",
+            "format": "%(levelname)s %(message)s",
         },
     },
     "handlers": {
@@ -271,11 +277,12 @@ LOGGING = {
             "level": "DEBUG",
             # Cambiado a TimedRotatingFileHandler
             "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": os.path.join(LOGS_DIR, 'server.log'), # Nombre base del archivo
+            # Nombre base del archivo
+            "filename": os.path.join(LOGS_DIR, 'server.log'),
             # --- Parámetros de Rotación ---
             "when": "midnight",  # Rotar cada día a medianoche
             "interval": 1,       # Intervalo de 1 día
-            "encoding": "utf-8", # Especificar codificación (recomendado)
+            "encoding": "utf-8",  # Especificar codificación (recomendado)
             # --- Fin Parámetros de Rotación ---
             "formatter": "verbose",
         },
@@ -293,12 +300,12 @@ LOGGING = {
         },
         "sentry_sdk": {
             "level": "ERROR",
-             "handlers": [],
+            "handlers": [],
             "propagate": True,
         },
         "django.security.DisallowedHost": {
-             "level": "ERROR",
-             "handlers": [],
+            "level": "ERROR",
+            "handlers": [],
             "propagate": True,
         },
     },
@@ -349,7 +356,8 @@ REDIS_SSL = REDIS_URL.startswith("rediss://")
 # CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 # django-allauth
 # ------------------------------------------------------------------------------
-ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
+ACCOUNT_ALLOW_REGISTRATION = env.bool(
+  "DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_LOGIN_METHODS = {"username"}
 # https://docs.allauth.org/en/latest/account/configuration.html
@@ -369,12 +377,13 @@ SOCIALACCOUNT_FORMS = {"signup": "backend.users.forms.UserSocialSignupForm"}
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 12,
 }
 
 # django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
@@ -393,3 +402,7 @@ SPECTACULAR_SETTINGS = {
 # Corsheaders
 CORS_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS = [url for url in os.environ['WEBSITE_FRONTEND_URL'].split(
     ",")] if 'WEBSITE_FRONTEND_URL' in os.environ else []
+
+CORS_ORIGIN_WHITELIST = CORS_ALLOWED_ORIGINS
+
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
