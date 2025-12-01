@@ -47,6 +47,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
   gettext \
   # entrypoint
   wait-for-it \
+  telnet \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
@@ -86,13 +87,14 @@ RUN chmod +x /start-flower
 # copy application code to WORKDIR
 COPY --chown=django:django . ${APP_HOME}
 
+# Crar carpeta de logs y darle permisos
+RUN mkdir -p ${APP_HOME}/logs && \
+    chmod -R 755 ${APP_HOME}/logs && \
+    chown -R django:django ${APP_HOME}/logs
+
 # make django owner of the WORKDIR directory as well.
 RUN chown -R django:django ${APP_HOME}
 
 USER django
-
-RUN DATABASE_URL="" \
-  DJANGO_SETTINGS_MODULE="config.settings.test" \
-  python manage.py compilemessages
 
 ENTRYPOINT ["/entrypoint"]

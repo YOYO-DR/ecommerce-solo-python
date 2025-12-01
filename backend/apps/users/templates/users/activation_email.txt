@@ -1,0 +1,18 @@
+🎉 Welcome to AllNutrition!
+
+Hello {{ first_name|default:"there" }}! 👋
+
+Thank you for registering with us! We're excited to have you join our community.
+
+To complete your registration and start shopping, please activate your account by clicking the link below:
+
+{{ activation_link }}
+
+⏰ IMPORTANT: This activation link will expire in 24 hours for security reasons.
+
+If you didn't create an account with us, please ignore this email or contact our support team if you have concerns.
+
+---
+AllNutrition
+Your trusted partner for nutrition and wellness
+© 2025 AllNutrition. All rights reserved.

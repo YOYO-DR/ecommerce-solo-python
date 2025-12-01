@@ -4,24 +4,14 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-if [ -z "${POSTGRES_USER}" ]; then
+if [ -z "${PG_POSTGRES_USER}" ]; then
     base_postgres_image_default_user='postgres'
-    export POSTGRES_USER="${base_postgres_image_default_user}"
+    export PG_POSTGRES_USER="${base_postgres_image_default_user}"
 fi
-export DATABASE_URL="postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}"
+export DATABASE_URL="postgres://${PG_POSTGRES_USER}:${PG_POSTGRES_PASSWORD}@${PG_POSTGRES_HOST}:${PG_POSTGRES_PORT}/${POSTGRES_DB}"
 
-wait-for-it "${POSTGRES_HOST}:${POSTGRES_PORT}" -t 30
+wait-for-it "${PG_POSTGRES_HOST}:${PG_POSTGRES_PORT}" -t 30
 
 >&2 echo 'PostgreSQL is available'
-
-if [ -z "${REDIS_URL}" ]; then
-  >&2 echo 'Error: REDIS_URL is not set'
-  exit 1
-fi
-
-redis_host_port="${REDIS_HOST}:${REDIS_PORT}"
-wait-for-it "${redis_host_port}" -t 30
-
->&2 echo 'Redis is available'
 
 exec "$@"

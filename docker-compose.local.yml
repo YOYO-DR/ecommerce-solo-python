@@ -13,11 +13,12 @@ services:
     depends_on:
       - postgres
       - redis
-      - mailpit
     volumes:
       - ./backend:/app:z
+      - ./backend/logs:/app/logs
     env_file:
-      - ./backend/.env
+      - ./backend/.envs/.local/.django
+      - ./backend/.envs/.local/.postgres
     ports:
       - '8000:8000'
     command: /start
@@ -32,13 +33,9 @@ services:
       - backend_local_postgres_data:/var/lib/postgresql/data
       - backend_local_postgres_data_backups:/backups
     env_file:
-      - ./backend/.env
-
-  mailpit:
-    image: docker.io/axllent/mailpit:latest
-    container_name: backend_local_mailpit
+      - ./backend/.envs/.local/.postgres
     ports:
-      - "8025:8025"
+      - "5432:5432"
 
   redis:
     image: docker.io/redis:6
@@ -46,43 +43,34 @@ services:
     
     volumes:
       - backend_local_redis_data:/data
-    
 
-  # celeryworker:
-  #   <<: *django
-  #   image: backend_local_celeryworker
-  #   container_name: backend_local_celeryworker
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #     - mailpit
-  #   ports: []
-  #   command: /start-celeryworker
+  celeryworker:
+    <<: *django
+    image: backend_local_celeryworker
+    container_name: backend_local_celeryworker
+    depends_on:
+      - redis
+      - postgres
+    ports: []
+    command: /start-celeryworker
 
-  # celerybeat:
-  #   <<: *django
-  #   image: backend_local_celerybeat
-  #   container_name: backend_local_celerybeat
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #     - mailpit
-  #   ports: []
-  #   command: /start-celerybeat
+  celerybeat:
+    <<: *django
+    image: backend_local_celerybeat
+    container_name: backend_local_celerybeat
+    depends_on:
+      - redis
+      - postgres
+    ports: []
+    command: /start-celerybeat
 
-  # flower:
-  #   <<: *django
-  #   image: backend_local_flower
-  #   container_name: backend_local_flower
-  #   ports:
-  #     - '5555:5555'
-  #   command: /start-flower
-  
   frontend:
     build:
       context: ./frontend
-    container_name: frontend_local
-    volumes:
-      - ./frontend:/app:z
+      dockerfile: Dockerfile
+    image: backend_local_frontend
+    container_name: backend_local_frontend
     ports:
-      - '83:83'
+      - "5173:5173"
+    depends_on:
+      - django

@@ -3,10 +3,12 @@
 import os
 import sys
 from pathlib import Path
-
+from dotenv import load_dotenv
 
 def main():
     """Run administrative tasks."""
+    if os.environ.get("USE_DOCKER") == "False":
+      print("Loaded env from .env file", load_dotenv())
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
     try:
@@ -19,9 +21,9 @@ def main():
         ) from exc
 
     # This allows easy placement of apps within the interior
-    # backend directory.
+    # apps directory.
     current_path = Path(__file__).parent.resolve()
-    sys.path.append(str(current_path / "backend"))
+    sys.path.append(str(current_path / "apps"))
 
     execute_from_command_line(sys.argv)
 

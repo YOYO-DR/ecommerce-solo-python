@@ -1,24 +1,22 @@
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 
-import os
+import datetime
 import ssl
 from pathlib import Path
 
 import environ
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
-# backend/
-APPS_DIR = BASE_DIR / "backend"
+# apps/
+APPS_DIR = BASE_DIR / "apps"
 env = environ.Env()
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+print(READ_DOT_ENV_FILE)
 if READ_DOT_ENV_FILE:
   # OS environment variables take precedence over variables from .env
   env.read_env(str(BASE_DIR / ".env"))
-
-LOGS_DIR = os.path.join(BASE_DIR, 'logs')
-os.makedirs(LOGS_DIR, exist_ok=True)  # Crea el directorio 'logs' si no existe
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -30,7 +28,7 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # In Windows, this must be set to your system time zone.
 TIME_ZONE = "America/Bogota"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "es-419"
 # https://docs.djangoproject.com/en/dev/ref/settings/#languages
 # from django.utils.translation import gettext_lazy as _
 # LANGUAGES = [
@@ -62,6 +60,10 @@ ROOT_URLCONF = "config.urls"
 # https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
 WSGI_APPLICATION = "config.wsgi.application"
 
+# django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
+CORS_URLS_REGEX = r"^/api/.*$"
+CORS_ALLOWED_ORIGINS = env.list("DJANGO_CORS_ALLOWED_ORIGINS", default=[])
+
 # APPS
 # ------------------------------------------------------------------------------
 DJANGO_APPS = [
@@ -75,49 +77,48 @@ DJANGO_APPS = [
     "django.contrib.admin",
     "django.forms",
 ]
+
+PROJECT_APPS = ["apps.users"]
+ECOMMERCE_APPS = []
 THIRD_PARTY_APPS = [
-    "crispy_forms",
-    "crispy_bootstrap5",
-    "allauth",
-    "allauth.account",
-    "allauth.mfa",
-    "allauth.socialaccount",
-    # "django_celery_beat",
-    "rest_framework",
-    "rest_framework.authtoken",
     "corsheaders",
-    "drf_spectacular",
+    "rest_framework",
+    "djoser",
+    "social_django",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-    "django_prose_editor",
-    "djoser"
+    "ckeditor",
+    "ckeditor_uploader",
+    "django_celery_beat",
+    "drf_spectacular",
 ]
 
-LOCAL_APPS = [
-    "backend.users",
-    # Your stuff: custom apps go here
-]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + PROJECT_APPS + ECOMMERCE_APPS
 
-# MIGRATIONS
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
-MIGRATION_MODULES = {"sites": "backend.contrib.sites.migrations"}
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar": "full",
+        "autoParagraph": False,
+    }
+}
+
+CKEDITOR_UPLOAD_PATH = APPS_DIR / "media"
 
 # AUTHENTICATION
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
+    "social_core.backends.google.GoogleOAuth2",
+    "social_core.backends.facebook.FacebookOAuth2",
     "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
-LOGIN_URL = "account_login"
+LOGIN_URL = "admin:login"
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -143,17 +144,18 @@ AUTH_PASSWORD_VALIDATORS = [
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
-    "django.middleware.security.SecurityMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",
 ]
 
 # STATIC
@@ -172,11 +174,10 @@ STATICFILES_FINDERS = [
 
 # MEDIA
 # ------------------------------------------------------------------------------
-if DEBUG:
-  # https://docs.djangoproject.com/en/dev/ref/settings/#media-root
-  MEDIA_ROOT = str(APPS_DIR / "media")
-  # https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-  MEDIA_URL = "/media/"
+# https://docs.djangoproject.com/en/dev/ref/settings/#media-root
+MEDIA_ROOT = str(APPS_DIR / "media")
+# https://docs.djangoproject.com/en/dev/ref/settings/#media-url
+MEDIA_URL = "/media/"
 
 # TEMPLATES
 # ------------------------------------------------------------------------------
@@ -186,7 +187,7 @@ TEMPLATES = [
         # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         # https://docs.djangoproject.com/en/dev/ref/settings/#dirs
-        "DIRS": [str(APPS_DIR / "templates")],
+        "DIRS": [],
         # https://docs.djangoproject.com/en/dev/ref/settings/#app-dirs
         "APP_DIRS": True,
         "OPTIONS": {
@@ -200,7 +201,6 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "backend.users.context_processors.allauth_settings",
             ],
         },
     },
@@ -208,15 +208,6 @@ TEMPLATES = [
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#form-renderer
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
-
-# http://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-
-# FIXTURES
-# ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#fixture-dirs
-FIXTURE_DIRS = (str(APPS_DIR / "fixtures"),)
 
 # SECURITY
 # ------------------------------------------------------------------------------
@@ -245,10 +236,6 @@ ADMIN_URL = "admin/"
 ADMINS = [("""Yoiner Duran Rios""", "yoiner3216898182@gmail.com")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
-# https://cookiecutter-django.readthedocs.io/en/latest/settings.html#other-environment-settings
-# Force the `admin` sign in process to go through the `django-allauth` workflow
-DJANGO_ADMIN_FORCE_ALLAUTH = env.bool(
-  "DJANGO_ADMIN_FORCE_ALLAUTH", default=False)
 
 # LOGGING
 # ------------------------------------------------------------------------------
@@ -260,10 +247,7 @@ LOGGING = {
     "disable_existing_loggers": False,
     "formatters": {
         "verbose": {
-            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
-        },
-        "simple": {
-            "format": "%(levelname)s %(message)s",
+            "format": "%(levelname)s %(asctime)s [function %(name)s.%(funcName)s] [process %(process)d] [thread %(thread)d] %(message)s",  # noqa: E501
         },
     },
     "handlers": {
@@ -272,41 +256,35 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
-        # --- Handler de archivo con rotación diaria ---
         "file": {
-            "level": "DEBUG",
-            # Cambiado a TimedRotatingFileHandler
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            # Nombre base del archivo
-            "filename": os.path.join(LOGS_DIR, 'server.log'),
-            # --- Parámetros de Rotación ---
-            "when": "midnight",  # Rotar cada día a medianoche
-            "interval": 1,       # Intervalo de 1 día
-            "encoding": "utf-8",  # Especificar codificación (recomendado)
-            # --- Fin Parámetros de Rotación ---
+            "level": "INFO",
+            "class": "logging.handlers.WatchedFileHandler",
+            "filename": BASE_DIR / "logs" / f"{env('DJANGO_NAME_LOG_FILE')}.log",
             "formatter": "verbose",
+            "encoding": "utf-8",
         },
-        # ------------------------------------------
     },
-    "root": {
-        "level": "DEBUG",
-        "handlers": ["console", "file"],
-    },
+    "root": {"level": "INFO", "handlers": ["console", "file"]},
     "loggers": {
-        "django.db.backends": {
-            "level": "ERROR",
-            "handlers": [],
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
             "propagate": True,
         },
-        "sentry_sdk": {
-            "level": "ERROR",
-            "handlers": [],
+        "celery": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "apps": {
+            "handlers": ["console"],
+            "level": "INFO",
             "propagate": True,
         },
-        "django.security.DisallowedHost": {
-            "level": "ERROR",
-            "handlers": [],
-            "propagate": True,
+        "config": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
 }
@@ -316,93 +294,75 @@ REDIS_SSL = REDIS_URL.startswith("rediss://")
 
 # Celery
 # ------------------------------------------------------------------------------
-# if USE_TZ:
-#     # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-timezone
-#     CELERY_TIMEZONE = TIME_ZONE
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-broker_url
-# CELERY_BROKER_URL = REDIS_URL
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
-# CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE} if REDIS_SSL else None
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-result_backend
-# CELERY_RESULT_BACKEND = REDIS_URL
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
-# CELERY_REDIS_BACKEND_USE_SSL = CELERY_BROKER_USE_SSL
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-extended
-# CELERY_RESULT_EXTENDED = True
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-backend-always-retry
-# # https://github.com/celery/celery/pull/6122
-# CELERY_RESULT_BACKEND_ALWAYS_RETRY = True
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-backend-max-retries
-# CELERY_RESULT_BACKEND_MAX_RETRIES = 10
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-accept_content
-# CELERY_ACCEPT_CONTENT = ["json"]
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-task_serializer
-# CELERY_TASK_SERIALIZER = "json"
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-result_serializer
-# CELERY_RESULT_SERIALIZER = "json"
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-time-limit
-# # TODO: set to whatever value is adequate in your circumstances
-# CELERY_TASK_TIME_LIMIT = 5 * 60
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-soft-time-limit
-# # TODO: set to whatever value is adequate in your circumstances
-# CELERY_TASK_SOFT_TIME_LIMIT = 60
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-scheduler
-# CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-send-task-events
-# CELERY_WORKER_SEND_TASK_EVENTS = True
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-task_send_sent_event
-# CELERY_TASK_SEND_SENT_EVENT = True
-# # https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-hijack-root-logger
-# CELERY_WORKER_HIJACK_ROOT_LOGGER = False
-# django-allauth
-# ------------------------------------------------------------------------------
-ACCOUNT_ALLOW_REGISTRATION = env.bool(
-  "DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
-# https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_LOGIN_METHODS = {"username"}
-# https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
-# https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"
-# https://docs.allauth.org/en/latest/account/configuration.html
-ACCOUNT_ADAPTER = "backend.users.adapters.AccountAdapter"
-# https://docs.allauth.org/en/latest/account/forms.html
-ACCOUNT_FORMS = {"signup": "backend.users.forms.UserSignupForm"}
-# https://docs.allauth.org/en/latest/socialaccount/configuration.html
-SOCIALACCOUNT_ADAPTER = "backend.users.adapters.SocialAccountAdapter"
-# https://docs.allauth.org/en/latest/socialaccount/configuration.html
-SOCIALACCOUNT_FORMS = {"signup": "backend.users.forms.UserSocialSignupForm"}
-
+if USE_TZ:
+  # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-timezone
+  CELERY_TIMEZONE = TIME_ZONE
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-broker_url
+CELERY_BROKER_URL = REDIS_URL
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
+CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE} if REDIS_SSL else None
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-result_backend
+CELERY_RESULT_BACKEND = REDIS_URL
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
+CELERY_REDIS_BACKEND_USE_SSL = CELERY_BROKER_USE_SSL
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-extended
+CELERY_RESULT_EXTENDED = True
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-backend-always-retry
+# https://github.com/celery/celery/pull/6122
+CELERY_RESULT_BACKEND_ALWAYS_RETRY = True
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-backend-max-retries
+CELERY_RESULT_BACKEND_MAX_RETRIES = 10
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-accept_content
+CELERY_ACCEPT_CONTENT = ["json"]
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-task_serializer
+CELERY_TASK_SERIALIZER = "json"
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-result_serializer
+CELERY_RESULT_SERIALIZER = "json"
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-time-limit
+# TODO: set to whatever value is adequate in your circumstances
+CELERY_TASK_TIME_LIMIT = 5 * 60
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-soft-time-limit
+# TODO: set to whatever value is adequate in your circumstances
+CELERY_TASK_SOFT_TIME_LIMIT = 60
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-scheduler
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-send-task-events
+CELERY_WORKER_SEND_TASK_EVENTS = True
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-task_send_sent_event
+CELERY_TASK_SEND_SENT_EVENT = True
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-hijack-root-logger
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 # django-rest-framework
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticatedOrReadOnly",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 12,
 }
 
-# django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
-CORS_URLS_REGEX = r"^/api/.*$"
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=1),
+    "ALGORITHM": "HS256",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+}
 
 # By Default swagger ui is available only to admin user(s). You can change permission classes to change that
 # See more configuration options at https://drf-spectacular.readthedocs.io/en/latest/settings.html#settings
 SPECTACULAR_SETTINGS = {
-    "TITLE": "backend API",
-    "DESCRIPTION": "Documentation of API endpoints of backend",
+    "TITLE": "eCommerce API",
+    "DESCRIPTION": "Documentation of API endpoints of eCommerce",
     "VERSION": "1.0.0",
     "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
     "SCHEMA_PATH_PREFIX": "/api/",
 }
-
-# Corsheaders
-CORS_ALLOWED_ORIGINS = CORS_ALLOWED_ORIGINS = [url for url in os.environ['WEBSITE_FRONTEND_URL'].split(
-    ",")] if 'WEBSITE_FRONTEND_URL' in os.environ else []
-
-CORS_ORIGIN_WHITELIST = CORS_ALLOWED_ORIGINS
-
-CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+# Your stuff...
+# ------------------------------------------------------------------------------
+# Frontend URL for email activation links
+FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:5173")

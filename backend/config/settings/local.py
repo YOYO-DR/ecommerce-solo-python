@@ -10,7 +10,8 @@ from .base import env
 DEBUG = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env(
-    "DJANGO_SECRET_KEY"
+    "DJANGO_SECRET_KEY",
+    default="default-secret-key-change-me-in-production",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
@@ -28,9 +29,17 @@ CACHES = {
 # EMAIL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-host
-EMAIL_HOST = env("EMAIL_HOST", default="mailpit")
+EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-port
-EMAIL_PORT = 1025
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-use-tls
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-host-user
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-host-password
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+# https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default=EMAIL_HOST_USER)
 
 # WhiteNoise
 # ------------------------------------------------------------------------------
@@ -61,13 +70,6 @@ if env("USE_DOCKER") == "yes":
 
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
-    # RunServerPlus
-    # ------------------------------------------------------------------------------
-    # This is a custom setting for RunServerPlus to fix reloader issue in Windows docker environment
-    # Werkzeug reloader type [auto, watchdog, or stat]
-    RUNSERVERPLUS_POLLER_RELOADER_TYPE = 'stat'
-    # If you have CPU and IO load issues, you can increase this poller interval e.g) 5
-    RUNSERVERPLUS_POLLER_RELOADER_INTERVAL = 1
 
 # django-extensions
 # ------------------------------------------------------------------------------
