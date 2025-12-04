@@ -113,6 +113,7 @@ AUTHENTICATION_BACKENDS = [
     "social_core.backends.facebook.FacebookOAuth2",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
@@ -349,8 +350,33 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
     "ACCESS_TOKEN_LIFETIME": datetime.timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": datetime.timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
     "ALGORITHM": "HS256",
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+}
+
+DJOSER = {
+  'LOGIN_FIELD': 'email',
+  'USER_CREATE_PASSWORD_RETYPE': True,
+  'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
+  'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+  'SEND_CONFIRMATION_EMAIL': True,
+  'SET_USERNAME_RETYPE': True,
+  'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+  'SET_PASSWORD_RETYPE': True,
+  'PASSWORD_RESET_CONFIRM_RETYPE': True,
+  'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
+  'ACTIVATION_URL': 'activate/{uid}/{token}',
+  'SEND_ACTIVATION_EMAIL': True,
+  'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
+  'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': env.list("DJOSER_SOCIAL_AUTH_ALLOWED_REDIRECT_URIS", default=['http://localhost:8000/google', 'http://localhost:8000/facebook']),
+  'SERIALIZERS': {
+      'user_create': 'apps.users.serializers.UserCreateSerializer',
+      'user': 'apps.users.serializers.UserCreateSerializer',
+      'current_user': 'apps.users.serializers.UserCreateSerializer',
+      'user_delete': 'djoser.serializers.UserDeleteSerializer',
+  }
 }
 
 # By Default swagger ui is available only to admin user(s). You can change permission classes to change that

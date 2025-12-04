@@ -1,7 +1,7 @@
 # Ecommerce con Solo Python
 
 ## Tiempo video
-39:40
+58:20
 
 ---
 ### Anotaciones

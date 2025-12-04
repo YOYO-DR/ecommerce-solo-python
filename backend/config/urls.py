@@ -7,12 +7,6 @@ from django.urls import path
 from django.views import defaults as default_views
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
-# type: ignore[import-not-found]
-from rest_framework_simplejwt.views import TokenRefreshView
-# type: ignore[import-not-found]
-from rest_framework_simplejwt.views import TokenVerifyView
-
-from apps.users.api.views import EmailTokenObtainPairView
 
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
@@ -36,6 +30,9 @@ urlpatterns += [
         SpectacularSwaggerView.as_view(url_name="api-schema"),
         name="api-docs",
     ),
+    path("api/auth/", include("djoser.urls")),
+    path("api/auth/", include("djoser.urls.jwt")),
+    path("api/auth/", include("djoser.social.urls")),
 ]
 
 if settings.DEBUG:
