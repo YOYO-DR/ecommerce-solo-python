@@ -5,4 +5,6 @@ set -o pipefail
 set -o nounset
 
 
-exec celery -A config.celery_app worker -l INFO
+exec celery -A config.celery_app worker -l INFO \
+--concurrency=${CELERY_WORKER_CONCURRENCY:-1} \
+--max-tasks-per-child=${CELERY_WORKER_MAX_TASKS_PER_CHILD:-50} \
