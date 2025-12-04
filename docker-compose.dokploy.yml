@@ -80,6 +80,9 @@ services:
         limits:
           cpus: ${CELERYWORKER_CPU:-1}
           memory: ${CELERYWORKER_RAM:-1g}
+    networks:
+      - dokploy-network
+      - default
 
   celerybeat:
     <<: *django
@@ -96,6 +99,9 @@ services:
         limits:
           cpus: ${CELERYBEAT_CPU:-1}
           memory: ${CELERYBEAT_RAM:-1g}
+    networks:
+      - dokploy-network
+      - default
 
   nginx:
     build:
